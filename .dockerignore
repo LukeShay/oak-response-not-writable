@@ -1,0 +1,5 @@
+_build/
+.github/
+.vscode/
+.gitignore
+.editorconfig

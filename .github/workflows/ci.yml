@@ -1,0 +1,41 @@
+name: CI
+
+on: [push]
+
+jobs:
+  lint:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - uses: denoland/setup-deno@v1
+        with:
+          deno-version: v1.11.0
+      - run: deno lint
+  docker:
+    runs-on: ubuntu-20.04
+    needs: [lint]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - id: meta
+        uses: docker/metadata-action@v3
+        with:
+          images: lukeshaydocker/lapi
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=sha
+      - uses: docker/setup-buildx-action@v1
+      - uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - id: docker_build
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+      - run: echo ${{ steps.docker_build.outputs.digest }}

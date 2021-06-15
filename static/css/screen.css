@@ -1,0 +1,7 @@
+:root {
+  --w-screen-sm: 640px;
+  --w-screen-md: 768px;
+  --w-screen-lg: 1024px;
+  --w-screen-xl: 1280px;
+  --w-screen-2xl: 1536px;
+}
