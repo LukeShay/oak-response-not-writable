@@ -1,4 +1,4 @@
-#! /usr/bin/env -S deno run --unstable --allow-net --allow-read
+#! /usr/bin/env -S deno run --allow-net --allow-read --unstable
 
 import { Application, Router } from "https://deno.land/x/oak@v7.5.0/mod.ts";
 import { Handlebars } from "https://deno.land/x/handlebars@v0.7.0/mod.ts";
