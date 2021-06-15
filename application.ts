@@ -1,30 +1,37 @@
-#! /usr/bin/env -S deno run --unstable --allow-net --allow-read --allow-env --import-map=import_map.json
+#! /usr/bin/env -S deno run --unstable --allow-net --allow-read
 
-import { Application, HttpServerNative } from "oak/mod.ts";
-import { router } from "/routes/routes.ts";
-import { assets } from "/middlewares/assets.ts";
-import { handlebars } from "/middlewares/handlebars.ts";
-import { getPort } from "/helpers/application.ts";
+import { Application, Router } from "https://deno.land/x/oak@v7.5.0/mod.ts";
+import { Handlebars } from "https://deno.land/x/handlebars@v0.7.0/mod.ts";
 
-const app = new Application({
-  serverConstructor: HttpServerNative,
+const app = new Application();
+const router = new Router();
+const handle = new Handlebars();
+
+router.get("/", function (ctx) {
+  ctx.response.body = { hello: "There" };
 });
 
-// serve assets
-app.use(assets("/assets", "./_build/static"));
+router.get("/redirect", function (ctx) {
+  ctx.response.redirect("/");
+});
 
-// add render function to context
-app.use(handlebars());
+router.get("/broken-view", async function (ctx) {
+  ctx.response.body = await handle.renderView("index");
+});
 
-// add the routes
+router.get("/view", function (ctx) {
+  ctx.response.body = () => handle.renderView("index");
+});
+
 app.use(router.routes(), router.allowedMethods());
 
 // deno-lint-ignore no-explicit-any
 app.addEventListener("listen", ({ hostname, port, secure }: any) => {
   console.log(
-    `Listening on: ${secure ? "https://" : "http://"}${hostname ??
-      "localhost"}:${port}`,
+    `Listening on: ${secure ? "https://" : "http://"}${
+      hostname ?? "localhost"
+    }:${port}`
   );
 });
 
-await app.listen({ port: getPort() });
+await app.listen({ port: 8000 });
