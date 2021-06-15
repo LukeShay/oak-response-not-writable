@@ -11,10 +11,6 @@ router.get("/", function (ctx) {
   ctx.response.body = { hello: "There" };
 });
 
-router.get("/redirect", function (ctx) {
-  ctx.response.redirect("/");
-});
-
 router.get("/broken-view", async function (ctx) {
   ctx.response.body = await handle.renderView("index");
 });
